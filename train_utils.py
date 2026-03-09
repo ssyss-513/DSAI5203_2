@@ -8,7 +8,20 @@ import matplotlib.pyplot as plt
 from IPython.display import clear_output
 
 def get_device():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    """Auto-detect the best available compute device.
+
+    Priority:
+    1) CUDA (NVIDIA GPU)
+    2) MPS (Apple Silicon GPU)
+    3) CPU
+    """
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+
     print(f"Using device: {device}")
     return device
 
