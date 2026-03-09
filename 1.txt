@@ -1,0 +1,16 @@
+[Task2] (1/4) Training linear SVM ...
+[Task2] (1/4) Done linear   | acc=0.5450 | time=37.0s | progress=25% | ETA~111.0s
+[Task2] (2/4) Training rbf SVM ...
+[Task2] (2/4) Done rbf      | acc=0.5383 | time=64.4s | progress=50% | ETA~101.4s
+[Task2] (3/4) Training poly SVM ...
+[Task2] (3/4) Done poly     | acc=0.5150 | time=31.4s | progress=75% | ETA~44.3s
+[Task2] (4/4) Training sigmoid SVM ...
+[Task2] (4/4) Done sigmoid  | acc=0.5050 | time=30.0s | progress=100% | ETA~0.0s
+Task 2 SVM accuracy:
+  linear   -> 0.5450 | 37.0s
+  rbf      -> 0.5383 | 64.4s
+  poly     -> 0.5150 | 31.4s
+  sigmoid  -> 0.5050 | 30.0s
+Best kernel: linear (0.5450)
+Task 2 done.
+Best SVM kernel: linear, acc=0.5450
