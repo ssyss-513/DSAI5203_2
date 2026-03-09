@@ -19,7 +19,7 @@ def get_dataloaders(dataset, test_set, batch_size, num_workers=4, pin_memory=Tru
         shuffle=True, 
         num_workers=num_workers, 
         pin_memory=pin_memory, 
-        drop_last=True
+        drop_last=False
     )
     test_loader = DataLoader(
         test_set, 
@@ -29,6 +29,20 @@ def get_dataloaders(dataset, test_set, batch_size, num_workers=4, pin_memory=Tru
         pin_memory=pin_memory
     )
     return train_loader, test_loader
+
+def _prepare_frame(frame, device, frame_layout):
+    """Convert frame layout for model forward.
+
+    frame layouts:
+    - 'btc': (B, T, C), no transpose
+    - 'bct': (B, C, T), no transpose
+    - 'tbc': (T, B, C), generated from (B, T, C) by transpose(0, 1)
+    """
+    if frame_layout == "tbc":
+        return frame.transpose(0, 1).to(device)
+    if frame_layout in ("btc", "bct"):
+        return frame.to(device)
+    raise ValueError(f"Unsupported frame_layout: {frame_layout}")
 
 def plot_training_history(train_losses, train_accs, test_accs, model_name="Model"):
     clear_output(wait=True)
@@ -59,7 +73,18 @@ def plot_training_history(train_losses, train_accs, test_accs, model_name="Model
     plt.tight_layout()
     plt.show()
 
-def train_and_eval_visualized(model, train_loader, test_loader, optimizer, criterion, epochs, save_dir, device, model_name="Model"):
+def train_and_eval_visualized(
+    model,
+    train_loader,
+    test_loader,
+    optimizer,
+    criterion,
+    epochs,
+    save_dir,
+    device,
+    model_name="Model",
+    frame_layout="tbc",
+):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -97,7 +122,7 @@ def train_and_eval_visualized(model, train_loader, test_loader, optimizer, crite
         total_samples = 0
 
         for frame, label in train_loader:
-            frame = frame.transpose(0, 1).to(device) # SpikingJelly T维度在前
+            frame = _prepare_frame(frame, device, frame_layout)
             label = label.to(device)
 
             optimizer.zero_grad()
@@ -122,7 +147,7 @@ def train_and_eval_visualized(model, train_loader, test_loader, optimizer, crite
         total_test = 0
         with torch.no_grad():
             for frame, label in test_loader:
-                frame = frame.transpose(0, 1).to(device)
+                frame = _prepare_frame(frame, device, frame_layout)
                 label = label.to(device)
                 output = model(frame)
                 test_corrects += (output.argmax(1) == label).sum().item()
