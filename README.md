@@ -49,6 +49,13 @@ Recommended Python packages:
 - `epochs`, `info`, `sfreq`
 - saved figures under `pic/`
 
+### Task 1 Figures (from `pic/`)
+
+![Task1 Centered 10-Channel](./pic/task1c_figure1_centered.png)
+![Task1 Normalized 10-Channel](./pic/task1c_figure2_normalized.png)
+![Task1 Single-Channel Zoom](./pic/task1c_figure3_single_channel_zoom.png)
+![Task1 Topomap Theta Alpha Beta](./pic/1.png)
+
 ## Task 2: SVM Classification (AAD)
 
 ### What is implemented
@@ -107,10 +114,22 @@ Interpretation:
 4. Track train/test accuracy by epoch and save best checkpoint
 5. Plot training curves using `train_utils.plot_training_history`
 
+### Network structure (EEGFMBaseline)
+
+- Input: EEG sequence as time‑tokens with channel vectors
+- Linear input projection: `C -> d_model` (default `d_model=128`)
+- Transformer encoder: `num_layers=4`, `nhead=8`, `dim_ff=256`, `GELU`, `norm_first=True`
+- Temporal mean pooling + LayerNorm
+- Linear classifier: `d_model -> 2`
+
 ### Output of Task 3
 
 - `fm_model`, `fm_hist`, `fm_best_acc`
 - checkpoint saved to `checkpoints/fm_baseline_best.pth`
+
+### Task 3 Figure (from `pic/`)
+
+![Task3 Training Curve](./pic/Task3.png)
 
 ## Task 4: Advanced Deep Model (Conv + BiGRU + Attention)
 
@@ -123,6 +142,16 @@ Interpretation:
    - multi‑head self‑attention
    - mean pooling + classifier
 3. Track train/test accuracy and report best test accuracy
+
+### Network structure (AdvancedAADNet)
+
+- Temporal convolution stack:
+  - `Conv1d(C -> H, k=7)` + BN + GELU
+  - `Conv1d(H -> H, k=5)` + BN + GELU
+- BiGRU: 2 layers, bidirectional, hidden `H/2`
+- Multi‑head self‑attention: `num_heads=4`
+- Mean pooling over time
+- Classifier: LayerNorm → Linear( H -> 64 ) → GELU → Dropout(0.2) → Linear(64 -> 2)
 
 ### Output of Task 4
 
